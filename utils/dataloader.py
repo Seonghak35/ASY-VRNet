@@ -73,11 +73,12 @@ class YoloDataset(Dataset):
         name = self.annotation_lines[index]
         pattern_string = "\d{10}.\d{5}"
         pattern = re.compile(pattern_string)  # 查找数字
-        name = pattern.findall(name)[-1]
+#        name = pattern.findall(name)[-1]
+        name = os.path.splitext(os.path.basename(name))[0]
 
         # ---------------------- 分割数据 ------------------- #
         # jpg = Image.open(os.path.join(os.path.join(self.seg_dataset_path, "VOC2007/JPEGImages"), name + ".jpg"))
-        png = Image.open(os.path.join(os.path.join(self.seg_dataset_path, "VOC2007/SegmentationClass"), name + ".png"))
+        png = Image.open(os.path.join(os.path.join(self.seg_dataset_path, "SegmentationClass"), name + ".png"))
         # -------------------------------------------------- #
 
         image, box, radar, png = self.get_random_data(self.annotation_lines[index], self.input_shape, png, name, random=self.train)

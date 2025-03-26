@@ -1,4 +1,8 @@
 pier
-vessel
+buoy
+sailor
 ship
 boat
+vessel
+kayak
+

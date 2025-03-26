@@ -17,7 +17,7 @@ from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 from .utils import cvtColor, preprocess_input, resize_image
 from .utils_metrics import compute_mIoU
-
+import pdb
 
 class LossHistory():
     def __init__(self, log_dir, model, input_shape):
@@ -101,7 +101,8 @@ class EvalCallback():
 
         pattern_string = "\d{10}.\d{5}"
         pattern = re.compile(pattern_string)  # 查找数字
-        self.image_ids = [pattern.findall(image_id)[-1] for image_id in image_ids]
+        # self.image_ids = [pattern.findall(image_id)[-1] for image_id in image_ids]
+        self.image_ids = [os.path.splitext(os.path.basename(image_id.split()[0]))[0] for image_id in image_ids]
 
         self.mious = [0]
         self.epoches = [0]

@@ -32,7 +32,7 @@ if __name__ == "__main__":
     #   Cuda    是否使用Cuda
     #           没有GPU可以设置成False
     # ---------------------------------#
-    Cuda = True
+    Cuda = False
     # ---------------------------------------------------------------------#
     #   distributed     用于指定是否使用单机多卡分布式运行
     #                   终端指令仅支持Ubuntu。CUDA_VISIBLE_DEVICES用于在Ubuntu下指定显卡。
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     #
     #   余弦退火算法的参数放到下面的lr_decay_type中设置
     # ------------------------------------------------------------------#
-    mosaic = False
+    mosaic = True
     mosaic_prob = 0.5
     mixup = False
     mixup_prob = 0.5
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     # ------------------------------------------------------------------#
     Init_Epoch = 0
     Freeze_Epoch = 10
-    Freeze_batch_size = 32
+    Freeze_batch_size = 2
     # ------------------------------------------------------------------#
     #   解冻阶段训练参数
     #   此时模型的主干不被冻结了，特征提取网络会发生改变
@@ -158,7 +158,7 @@ if __name__ == "__main__":
     #   Unfreeze_batch_size     模型在解冻后的batch_size
     # ------------------------------------------------------------------#
     UnFreeze_Epoch = 100
-    Unfreeze_batch_size = 16
+    Unfreeze_batch_size = 4
     # ------------------------------------------------------------------#
     #   Freeze_Train    是否进行冻结训练
     #                   默认先冻结主干训练后解冻训练。
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     #   Init_lr         模型的最大学习率
     #   Min_lr          模型的最小学习率，默认为最大学习率的0.01
     # ------------------------------------------------------------------#
-    Init_lr = 1e-2
+    Init_lr = 1e-3
     Min_lr = Init_lr * 0.01
     # ------------------------------------------------------------------#
     #   optimizer_type  使用到的优化器种类，可选的有adam、sgd
@@ -182,9 +182,9 @@ if __name__ == "__main__":
     #   weight_decay    权值衰减，可防止过拟合
     #                   adam会导致weight_decay错误，使用adam时建议设置为0。
     # ------------------------------------------------------------------#
-    optimizer_type = "sgd"
-    momentum = 0.937
-    weight_decay = 5e-4
+    optimizer_type = "adam"
+    momentum = 0.9
+    weight_decay = 0
     # ------------------------------------------------------------------#
     #   lr_decay_type   使用到的学习率下降方式，可选的有step、cos
     # ------------------------------------------------------------------#
@@ -207,18 +207,18 @@ if __name__ == "__main__":
     #   （二）此处设置评估参数较为保守，目的是加快评估速度。
     # ------------------------------------------------------------------#
     eval_flag = True
-    eval_period = 5
+    eval_period = 1
     # ------------------------------------------------------------------#
     #   num_workers     用于设置是否使用多线程读取数据
     #                   开启后会加快数据读取速度，但是会占用更多内存
     #                   内存较小的电脑可以设置为2或者0
     # ------------------------------------------------------------------#
-    num_workers = 2
+    num_workers = 0
 
     # ----------------------------------------------------#
     # 雷达feature map路径
     # ----------------------------------------------------#
-    radar_file_path = "E:/Big_Datasets/water_surface/all-1114/all/VOCradar"
+    radar_file_path = "/workspaces/ASY-VRNet/VOCdevkit/VOC2007/VOCradar"
 
     # ----------------------------------------------------#
     #   获得目标检测图片路径和标签
@@ -231,13 +231,14 @@ if __name__ == "__main__":
     # ------------------------------------------------------------------#
     #   VOCdevkit_path  分割数据集路径
     # ------------------------------------------------------------------#
-    VOCdevkit_path = 'E:/Normal_Workspace_Collection/hrnet-pytorch-main/hrnet-pytorch-main/VOCdevkit/VOC2007'
+    # VOCdevkit_path = 'E:/Normal_Workspace_Collection/hrnet-pytorch-main/hrnet-pytorch-main/VOCdevkit/VOC2007'
+    VOCdevkit_path = '/workspaces/ASY-VRNet/VOCdevkit/VOC2007'
 
     # -----------------------------------------------------#
     #   num_classes     训练自己的数据集必须要修改的
     #                   自己需要的分类个数+1，如2+1
     # -----------------------------------------------------#
-    num_classes_seg = 9
+    num_classes_seg = 8 # waterscenes dataset have 7 classes.
 
     #   建议选项：
     #   种类少（几类）时，设置为True
@@ -294,7 +295,8 @@ if __name__ == "__main__":
     # ------------------------------------------------------#
     #   创建yolo模型
     # ------------------------------------------------------#
-    model = EfficientVRNet(num_classes=num_classes, num_seg_classes=num_classes_seg, phi=phi).cuda(local_rank)
+    # model = EfficientVRNet(num_classes=num_classes, num_seg_classes=num_classes_seg, phi=phi).cuda(local_rank)
+    model = EfficientVRNet(num_classes=num_classes, num_seg_classes=num_classes_seg, phi=phi)
     weights_init(model)
     if model_path != '':
         # ------------------------------------------------------#
@@ -416,11 +418,18 @@ if __name__ == "__main__":
         if num_train // Unfreeze_batch_size == 0:
             raise ValueError('数据集过小，无法进行训练，请扩充数据集。')
         wanted_epoch = wanted_step // (num_train // Unfreeze_batch_size) + 1
-        print("\n\033[1;33;44m[Warning] 使用%s优化器时，建议将训练总步长设置到%d以上。\033[0m" % (optimizer_type, wanted_step))
-        print("\033[1;33;44m[Warning] 本次运行的总训练数据量为%d，Unfreeze_batch_size为%d，共训练%d个Epoch，计算出总训练步长为%d。\033[0m" % (
+        print("\n\033[1;33;44m[Warning] When using the %s optimizer, it is recommended to set the total training steps to at least %d.\033[0m" % (optimizer_type, wanted_step))
+        print("\033[1;33;44m[Warning] In this run, the total number of training samples is %d, the Unfreeze_batch_size is %d, and the total number of training epochs is %d, resulting in %d total training steps.\033[0m" % (
             num_train, Unfreeze_batch_size, UnFreeze_Epoch, total_step))
-        print("\033[1;33;44m[Warning] 由于总训练步长为%d，小于建议总步长%d，建议设置总世代为%d。\033[0m" % (
+        print("\033[1;33;44m[Warning] Since the total training steps is %d, which is less than the recommended %d steps, it is suggested to set the number of epochs to %d.\033[0m" % (
             total_step, wanted_step, wanted_epoch))
+
+
+        # print("\n\033[1;33;44m[Warning] 使用%s优化器时，建议将训练总步长设置到%d以上。\033[0m" % (optimizer_type, wanted_step))
+        # print("\033[1;33;44m[Warning] 本次运行的总训练数据量为%d，Unfreeze_batch_size为%d，共训练%d个Epoch，计算出总训练步长为%d。\033[0m" % (
+        #     num_train, Unfreeze_batch_size, UnFreeze_Epoch, total_step))
+        # print("\033[1;33;44m[Warning] 由于总训练步长为%d，小于建议总步长%d，建议设置总世代为%d。\033[0m" % (
+        #     total_step, wanted_step, wanted_epoch))
 
 
     # ------------------------------------------------------#

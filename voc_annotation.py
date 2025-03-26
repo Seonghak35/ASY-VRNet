@@ -24,13 +24,13 @@ classes_path = 'model_data/waterscenes.txt'
 #   train_percent用于指定(训练集+验证集)中训练集与验证集的比例，默认情况下 训练集:验证集 = 9:1
 #   仅在annotation_mode为0和1的时候有效
 # --------------------------------------------------------------------------------------------------------------------------------#
-trainval_percent = 0.8
+trainval_percent = 1.0
 train_percent = 0.8
 # -------------------------------------------------------#
 #   指向VOC数据集所在的文件夹
 #   默认指向根目录下的VOC数据集
 # -------------------------------------------------------#
-VOCdevkit_path = "E:/dataset_collection/WaterScenes/all-1114-voc/all-1114/all/VOCdevkit"
+VOCdevkit_path = "/workspaces/ASY-VRNet/VOCdevkit"
 
 VOCdevkit_sets = [('2007', 'train'), ('2007', 'val')]
 classes, _ = get_classes(classes_path)
