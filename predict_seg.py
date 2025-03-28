@@ -4,6 +4,7 @@
 #----------------------------------------------------#
 import time
 
+import os
 import cv2
 import numpy as np
 from PIL import Image
@@ -60,7 +61,7 @@ if __name__ == "__main__":
     #   
     #   dir_origin_path和dir_save_path仅在mode='dir_predict'时有效
     #-------------------------------------------------------------------------#
-    dir_origin_path = "img/"
+    dir_origin_path = "VOCdevkit/VOC2007/"
     dir_save_path   = "img_out/"
     #-------------------------------------------------------------------------#
     #   simplify            使用Simplify onnx
@@ -87,14 +88,17 @@ if __name__ == "__main__":
             img = input('Input image filename:')
             try:
                 image = Image.open(img)
-                image_id = img[-20:-4]
+                image_id = img[-9:-4]
             except Exception as e:
                 print('Open Error! Try again!')
                 print(e)
                 continue
             else:
                 r_image = deeplab.detect_image(image, image_id, count=count, name_classes=name_classes)
-                r_image.show()
+                if not os.path.exists(dir_save_path):
+                    os.makedirs(dir_save_path)
+                r_image.save(os.path.join(dir_save_path, image_id + ".png"), quality=95, subsampling=0)
+                # r_image.show()
 
     elif mode == "video":
         capture=cv2.VideoCapture(video_path)
