@@ -26,21 +26,21 @@ class DeeplabV3(object):
         #   验证集损失较低不代表miou较高，仅代表该权值在验证集上泛化性能较好。
         #-------------------------------------------------------------------#
         "model_path"        : 'logs/best_epoch_weights.pth',
-        "radar_root": "E:/Big_Datasets/water_surface/all-1114/all/VOCradar",
+        "radar_root": "VOCdevkit/VOC2007/VOCradar/",
         #----------------------------------------#
         #   所需要区分的类的个数+1
         #----------------------------------------#
-        "num_classes"       : 9,
+        "num_classes"       : 8,
         #----------------------------------------#
         #   所使用的的主干网络：
         #   mobilenet
         #   xception    
         #----------------------------------------#
-        "backbone"          : "",
+        "backbone"          : "mobilenet",
         #----------------------------------------#
         #   输入图片的大小
         #----------------------------------------#
-        "input_shape"       : [512, 512],
+        "input_shape"       : [320, 320],
         #----------------------------------------#
         #   下采样的倍数，一般可选的为8和16
         #   与训练时设置的一样即可
@@ -58,7 +58,7 @@ class DeeplabV3(object):
         #   是否使用Cuda
         #   没有GPU可以设置成False
         #-------------------------------#
-        "cuda"              : True,
+        "cuda"              : False,
         "phi": 'nano',
     }
 
@@ -95,7 +95,7 @@ class DeeplabV3(object):
         #-------------------------------#
         #   载入模型与权值
         #-------------------------------#
-        self.net = EfficientVRNet(num_classes=4, num_seg_classes=self.num_classes, phi=self.phi)
+        self.net = EfficientVRNet(num_classes=8, num_seg_classes=self.num_classes, phi=self.phi)
 
         device      = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.net.load_state_dict(torch.load(self.model_path, map_location=device))
