@@ -11,7 +11,7 @@ from nets.efficient_vrnet import EfficientVRNet
 from utils.utils import (cvtColor, get_classes, preprocess_input, resize_image,
                          show_config, preprocess_input_radar)
 from utils.utils_bbox import decode_outputs, non_max_suppression
-
+import pdb
 '''
 训练自己的数据集必看注释！
 '''
@@ -27,13 +27,13 @@ class YOLO(object):
         #   验证集损失较低不代表mAP较高，仅代表该权值在验证集上泛化性能较好。
         #   如果出现shape不匹配，同时要注意训练时的model_path和classes_path参数的修改
         # --------------------------------------------------------------------------#
-        "model_path"        : 'logs/last_epoch_weights.pth',
-        "radar_root": "E:/Big_Datasets/water_surface/all-1114/all/VOCradar",
+        "model_path"        : 'logs/best_epoch_weights.pth',
+        "radar_root": "VOCdevkit/VOC2007/VOCradar/",
         "classes_path": 'model_data/waterscenes.txt',
         # ---------------------------------------------------------------------#
         #   输入图片的大小，必须为32的倍数。
         # ---------------------------------------------------------------------#
-        "input_shape": [512, 512],
+        "input_shape": [320, 320],
         # ---------------------------------------------------------------------#
         #   所使用的YoloX的版本。nano、tiny、s、m、l、x
         # ---------------------------------------------------------------------#
@@ -55,7 +55,7 @@ class YOLO(object):
         #   是否使用Cuda
         #   没有GPU可以设置成False
         # -------------------------------#
-        "cuda": True,
+        "cuda": False,
     }
 
     @classmethod
@@ -93,7 +93,7 @@ class YOLO(object):
     #   生成模型
     # ---------------------------------------------------#
     def generate(self, onnx=False):
-        self.net = EfficientVRNet(num_classes=self.num_classes, num_seg_classes=9, phi=self.phi)
+        self.net = EfficientVRNet(num_classes=self.num_classes, num_seg_classes=8, phi=self.phi)
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.net.load_state_dict(torch.load(self.model_path, map_location=device))
         self.net = self.net.eval()
@@ -159,8 +159,9 @@ class YOLO(object):
         # ---------------------------------------------------------#
         #   设置字体与边框厚度
         # ---------------------------------------------------------#
-        font = ImageFont.truetype(font='model_data/simhei.ttf',
-                                  size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
+        # font = ImageFont.truetype(font='',
+                                #   size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
+        font = ImageFont.load_default()
         thickness = int(max((image.size[0] + image.size[1]) // np.mean(self.input_shape), 1))
         # ---------------------------------------------------------#
         #   计数
