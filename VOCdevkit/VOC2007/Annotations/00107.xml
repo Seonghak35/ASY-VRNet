@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<annotation>
+  <filename>1668934442.57919.jpg</filename>
+  <object_num>3</object_num>
+  <size>
+    <width>1920</width>
+    <height>1080</height>
+  </size>
+  <object>
+    <name>boat</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>1530</xmin>
+      <ymin>318</ymin>
+      <xmax>1691</xmax>
+      <ymax>409</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>buoy</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>1752</xmin>
+      <ymin>198</ymin>
+      <xmax>1900</xmax>
+      <ymax>464</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>buoy</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>1779</xmin>
+      <ymin>182</ymin>
+      <xmax>1919</xmax>
+      <ymax>473</ymax>
+    </bndbox>
+  </object>
+</annotation>

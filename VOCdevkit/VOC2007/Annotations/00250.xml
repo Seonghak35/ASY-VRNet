@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<annotation>
+  <filename>1670046674.12059.jpg</filename>
+  <object_num>3</object_num>
+  <size>
+    <width>1920</width>
+    <height>1080</height>
+  </size>
+  <object>
+    <name>ship</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>1542</xmin>
+      <ymin>460</ymin>
+      <xmax>1633</xmax>
+      <ymax>484</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>ship</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>980</xmin>
+      <ymin>334</ymin>
+      <xmax>1494</xmax>
+      <ymax>482</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>ship</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>1762</xmin>
+      <ymin>480</ymin>
+      <xmax>1795</xmax>
+      <ymax>495</ymax>
+    </bndbox>
+  </object>
+</annotation>

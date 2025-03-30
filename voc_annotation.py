@@ -31,10 +31,8 @@ train_percent = 0.8
 #   默认指向根目录下的VOC数据集
 # -------------------------------------------------------#
 VOCdevkit_path = "/workspaces/ASY-VRNet/VOCdevkit"
-
 VOCdevkit_sets = [('2007', 'train'), ('2007', 'val')]
 classes, _ = get_classes(classes_path)
-
 
 def convert_annotation(year, image_id, list_file):
     # print(year)
@@ -55,7 +53,6 @@ def convert_annotation(year, image_id, list_file):
         b = (int(float(xmlbox.find('xmin').text)), int(float(xmlbox.find('ymin').text)),
              int(float(xmlbox.find('xmax').text)), int(float(xmlbox.find('ymax').text)))
         list_file.write(" " + ",".join([str(a) for a in b]) + ',' + str(cls_id))
-
 
 if __name__ == "__main__":
     random.seed(0)

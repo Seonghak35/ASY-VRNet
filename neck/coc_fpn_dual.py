@@ -11,7 +11,6 @@ from backbone.vision.context_cluster import ClusterBlock
 from backbone.fusion.vr_coc import coc_medium, coc_small
 from torchinfo import summary
 
-
 class CoCUpsample(nn.Module):
     def __init__(self, in_channels, out_channels, scale=2, ds_conv=False):
         super().__init__()
@@ -24,7 +23,6 @@ class CoCUpsample(nn.Module):
     def forward(self, x,):
         x = self.upsample(x)
         return x
-
 
 class CoC_Conv(nn.Module):
     def __init__(self, in_channels, out_channels, ksize=1, stride=1, act="relu", ds_conv=False):
@@ -129,7 +127,6 @@ def shuffle_channels(x, groups=2):
     x = x.view(batch_size, -1, h, w)
     return x
 
-
 class CoCFpnDual(nn.Module):
     def __init__(self, num_seg_class=9, depth=1.0, width=1.0, in_features=("dark2", "dark3", "dark4", "dark5"),
                  in_channels=[64, 128, 320, 512], aspp_channel=1024):
@@ -223,7 +220,6 @@ class CoCFpnDual(nn.Module):
 
         return (p3_out, p4_out, p5_out), x_segmentation_out
 
-
 if __name__ == '__main__':
     # input_map = torch.randn((1, 512, 20, 20)).cuda()
     # aspp = ASPP(dim_in=512, dim_out=1024).cuda()
@@ -245,7 +241,3 @@ if __name__ == '__main__':
     # input = torch.rand(1, 512, 20, 20)
     # output = model(input)
     # print(output.shape)
-
-
-
-

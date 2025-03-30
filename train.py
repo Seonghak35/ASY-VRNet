@@ -1,6 +1,6 @@
-# -------------------------------------#
-#       对数据集进行训练
-# -------------------------------------#
+# ------------------------------------- #
+# Training the dataset
+# ------------------------------------- #
 import datetime
 import os
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
@@ -26,11 +26,14 @@ from utils_seg.dataloader import DeeplabDataset, deeplab_dataset_collate
 from utils_seg.utils_fit import fit_one_epoch as fit_one_epoch_seg
 from utils_seg.callbacks import LossHistory as LossHistory_seg
 
-
+"""
+- radar, model input shape: 320, 320
+- rgb: train.py
+"""
 if __name__ == "__main__":
     # ---------------------------------#
-    #   Cuda    是否使用Cuda
-    #           没有GPU可以设置成False
+    #   Cuda    Use Cuda or not
+    #           if there's no GPU可以设置成False
     # ---------------------------------#
     Cuda = False
     # ---------------------------------------------------------------------#
@@ -53,7 +56,8 @@ if __name__ == "__main__":
     #   fp16        是否使用混合精度训练
     #               可减少约一半的显存、需要pytorch1.7.1以上
     # ---------------------------------------------------------------------#
-    fp16 = True
+    # fp16 = True
+    fp16 = False
     # ---------------------------------------------------------------------#
     #   classes_path    指向model_data下的txt，与自己训练的数据集相关
     #                   训练前一定要修改classes_path，使其对应自己的数据集
@@ -83,7 +87,8 @@ if __name__ == "__main__":
     # ------------------------------------------------------#
     #   input_shape     输入的shape大小，一定要是32的倍数
     # ------------------------------------------------------#
-    input_shape = [512, 512]
+    # input_shape = [512, 512]
+    input_shape = [320,320]
     # ------------------------------------------------------#
     #   所使用的YoloX的版本。nano、tiny、s、m、l
     # ------------------------------------------------------#
@@ -146,8 +151,8 @@ if __name__ == "__main__":
     #                       (当Freeze_Train=False时失效)
     # ------------------------------------------------------------------#
     Init_Epoch = 0
-    Freeze_Epoch = 10
-    Freeze_batch_size = 2
+    Freeze_Epoch = 0
+    Freeze_batch_size = 1
     # ------------------------------------------------------------------#
     #   解冻阶段训练参数
     #   此时模型的主干不被冻结了，特征提取网络会发生改变
@@ -159,6 +164,8 @@ if __name__ == "__main__":
     # ------------------------------------------------------------------#
     UnFreeze_Epoch = 100
     Unfreeze_batch_size = 4
+    # UnFreeze_Epoch = 300
+    # Unfreeze_batch_size = 8
     # ------------------------------------------------------------------#
     #   Freeze_Train    是否进行冻结训练
     #                   默认先冻结主干训练后解冻训练。
@@ -172,7 +179,8 @@ if __name__ == "__main__":
     #   Init_lr         模型的最大学习率
     #   Min_lr          模型的最小学习率，默认为最大学习率的0.01
     # ------------------------------------------------------------------#
-    Init_lr = 1e-3
+    # Init_lr = 1e-3
+    Init_lr = 1e-2
     Min_lr = Init_lr * 0.01
     # ------------------------------------------------------------------#
     #   optimizer_type  使用到的优化器种类，可选的有adam、sgd
@@ -182,9 +190,10 @@ if __name__ == "__main__":
     #   weight_decay    权值衰减，可防止过拟合
     #                   adam会导致weight_decay错误，使用adam时建议设置为0。
     # ------------------------------------------------------------------#
-    optimizer_type = "adam"
-    momentum = 0.9
-    weight_decay = 0
+    # optimizer_type = "adam"
+    optimizer_type = "sgd"
+    momentum = 0.937
+    weight_decay = 5e-4
     # ------------------------------------------------------------------#
     #   lr_decay_type   使用到的学习率下降方式，可选的有step、cos
     # ------------------------------------------------------------------#
@@ -207,7 +216,7 @@ if __name__ == "__main__":
     #   （二）此处设置评估参数较为保守，目的是加快评估速度。
     # ------------------------------------------------------------------#
     eval_flag = True
-    eval_period = 1
+    eval_period = 5
     # ------------------------------------------------------------------#
     #   num_workers     用于设置是否使用多线程读取数据
     #                   开启后会加快数据读取速度，但是会占用更多内存
@@ -283,7 +292,8 @@ if __name__ == "__main__":
             print(f"[{os.getpid()}] (rank = {rank}, local_rank = {local_rank}) training...")
             print("Gpu Device Count : ", ngpus_per_node)
     else:
-        device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+        # device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+        device = torch.device('cpu')
         local_rank = 1
         rank = 1
 
@@ -365,7 +375,8 @@ if __name__ == "__main__":
             # ----------------------------#
             #   多卡平行运行
             # ----------------------------#
-            model_train = model_train.cuda(local_rank)
+            # model_train = model_train.cuda(local_rank)
+            model_train = model_train.to(device)
             model_train = torch.nn.parallel.DistributedDataParallel(model_train, device_ids=[local_rank],
                                                                     find_unused_parameters=True)
         else:
@@ -504,15 +515,27 @@ if __name__ == "__main__":
         # ---------------------------------------#
         #   构建数据集加载器。
         # ---------------------------------------#
+        # train_dataset = YoloDataset(annotation_lines=train_lines, input_shape=input_shape, num_classes=num_classes,
+        #                             epoch_length=UnFreeze_Epoch, \
+        #                             mosaic=False, mixup=False, mosaic_prob=0, mixup_prob=0,
+        #                             train=False, special_aug_ratio=0, radar_root=radar_file_path,
+        #                             num_classes_seg=num_classes_seg, seg_dataset_path=VOCdevkit_path)
+
+        # val_dataset = YoloDataset(annotation_lines=val_lines, input_shape=input_shape, num_classes=num_classes,
+        #                           epoch_length=UnFreeze_Epoch, \
+        #                           mosaic=False, mixup=False, mosaic_prob=0, mixup_prob=0, train=False,
+        #                           special_aug_ratio=0, radar_root=radar_file_path,
+        #                           num_classes_seg=num_classes_seg, seg_dataset_path=VOCdevkit_path)
+
         train_dataset = YoloDataset(annotation_lines=train_lines, input_shape=input_shape, num_classes=num_classes,
-                                    epoch_length=UnFreeze_Epoch, \
-                                    mosaic=False, mixup=False, mosaic_prob=0, mixup_prob=0,
-                                    train=False, special_aug_ratio=0, radar_root=radar_file_path,
-                                    num_classes_seg=num_classes_seg, seg_dataset_path=VOCdevkit_path)
+                            epoch_length=UnFreeze_Epoch, \
+                            mosaic=True, mixup=False, mosaic_prob=0, mixup_prob=0,
+                            train=False, special_aug_ratio=0, radar_root=radar_file_path,
+                            num_classes_seg=num_classes_seg, seg_dataset_path=VOCdevkit_path)
 
         val_dataset = YoloDataset(annotation_lines=val_lines, input_shape=input_shape, num_classes=num_classes,
                                   epoch_length=UnFreeze_Epoch, \
-                                  mosaic=False, mixup=False, mosaic_prob=0, mixup_prob=0, train=False,
+                                  mosaic=True, mixup=False, mosaic_prob=0, mixup_prob=0, train=False,
                                   special_aug_ratio=0, radar_root=radar_file_path,
                                   num_classes_seg=num_classes_seg, seg_dataset_path=VOCdevkit_path)
 

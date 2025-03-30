@@ -2,6 +2,8 @@ import numpy as np
 import torch
 from torchvision.ops import nms, boxes
 
+device = torch.device("cpu")
+
 def yolo_correct_boxes(box_xy, box_wh, input_shape, image_shape, letterbox_image):
     #-----------------------------------------------------------------#
     #   把y轴放前面是因为方便预测框和图像的宽高进行相乘
@@ -69,8 +71,10 @@ def decode_outputs(outputs, input_shape, local_rank):
     #
     #   1, 8400, 2
     #---------------------------#
-    grids               = torch.cat(grids, dim=1).type(outputs.type()).cuda(local_rank)
-    strides             = torch.cat(strides, dim=1).type(outputs.type()).cuda(local_rank)
+    # grids               = torch.cat(grids, dim=1).type(outputs.type()).cuda(local_rank)
+    # strides             = torch.cat(strides, dim=1).type(outputs.type()).cuda(local_rank)
+    grids               = torch.cat(grids, dim=1).type(outputs.type()).to(device)
+    strides             = torch.cat(strides, dim=1).type(outputs.type()).to(device)
     #------------------------#
     #   根据网格点进行解码
     #------------------------#

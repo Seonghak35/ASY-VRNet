@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<annotation>
+  <filename>1665126320.94888.jpg</filename>
+  <object_num>1</object_num>
+  <size>
+    <width>1920</width>
+    <height>1080</height>
+  </size>
+  <object>
+    <name>vessel</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>1435</xmin>
+      <ymin>298</ymin>
+      <xmax>1919</xmax>
+      <ymax>452</ymax>
+    </bndbox>
+  </object>
+</annotation>

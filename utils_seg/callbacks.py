@@ -176,12 +176,13 @@ class EvalCallback():
                 # ------------------------------#
                 radar_path = os.path.join(self.radar_path, image_id + '.npz')
                 radar_data = np.load(radar_path)['arr_0']
-                radar_data = torch.from_numpy(radar_data).type(torch.FloatTensor).unsqueeze(0).cuda(self.local_rank)
+#                radar_data = torch.from_numpy(radar_data).type(torch.FloatTensor).unsqueeze(0).cuda(self.local_rank)
+                radar_data = torch.from_numpy(radar_data).type(torch.FloatTensor).unsqueeze(0)
 
                 # -------------------------------#
                 #   从文件中读取图像
                 # -------------------------------#
-                image_path = os.path.join(self.dataset_path, "VOC2007/JPEGImages/" + image_id + ".jpg")
+                image_path = os.path.join(self.dataset_path, "JPEGImages/" + image_id + ".jpg")
                 image = Image.open(image_path)
                 # ------------------------------#
                 #   获得预测txt

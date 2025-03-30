@@ -9,9 +9,8 @@ from thop import clever_format
 # from torchsummary import summary
 import time
 
-
 class EfficientVRNet(nn.Module):
-    def __init__(self, num_classes, num_seg_classes,  phi):
+    def __init__(self, num_classes, num_seg_classes,  phi, input_shape = (320,320)):
         super().__init__()
         depth_dict = {'nano': 0.33, 'tiny': 0.33, 's' : 0.33, 'm' : 0.67, 'l' : 1.00}
         width_dict = {'nano': 0.25, 'tiny': 0.375, 's' : 0.50, 'm' : 0.75, 'l' : 1.00}
@@ -20,12 +19,12 @@ class EfficientVRNet(nn.Module):
         self.backbone = CoCFpnDual(width=width, num_seg_class=num_seg_classes)
 
         self.head = DecoupleHead(num_classes, width, depthwise=True)
-
+        self.input_shape = input_shape
+        
     def forward(self, x, x_radar):
         fpn_outs, seg_outputs = self.backbone.forward(x, x_radar)
         det_outputs = self.head.forward(fpn_outs)
         return det_outputs, seg_outputs
-
 
 if __name__ == '__main__':
     model = EfficientVRNet(num_classes=4, phi='l', num_seg_classes=9).cuda()
